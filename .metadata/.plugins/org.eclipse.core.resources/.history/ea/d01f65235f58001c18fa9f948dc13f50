@@ -1,0 +1,182 @@
+package map;
+
+public class SimpleHashMap<K, V> implements Map <K,V>{
+	private Entry<K, V>[] table;
+	private int capacity = 16;
+	private double load = 0.75;
+	private int size;
+	
+	public SimpleHashMap() {
+		table = (Entry<K, V>[])	new Entry[capacity];
+		size=0;
+	}
+	
+	public SimpleHashMap(int capacity) {
+		this.capacity = capacity;
+		table = (Entry<K, V>[])	new Entry[capacity];
+		size=0;
+	}
+	
+	public static void main(String[] args) {
+		final int values = 8;
+		
+		
+		SimpleHashMap<Integer, Integer> map = new SimpleHashMap<Integer, Integer>(10);
+		
+		for (int i = 0; i < values; i++) {
+//			int rndNbr = rand.nextInt(200) - 100;
+			
+		}
+		
+		System.out.println(map.show());
+	}
+
+	@Override
+	public V get(Object arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return size==0;
+	}
+
+	@Override
+	public V put(K arg0, V arg1) {
+		int index = index(arg0);
+		if(table[index] == null) {
+			table[index]=new Entry (arg0, arg1);
+			if(size() > capacity*load) {
+				rehash();
+			}
+		}else {
+			Entry e = new Entry<K,V>(arg0, arg1);
+			Entry <K,V> old = find(index, arg0);
+			V oldValue = null;
+			if(old != null) {
+				oldValue = old.getValue();
+				old.value = arg1;
+			}else {
+				e.next = table[index];
+				table[index] = e;
+			}
+			if(size > capacity * load) {
+				rehash();
+			}
+			return oldValue;
+			
+		}
+		
+		return null;
+	}
+
+	@Override
+	public V remove(Object arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int size() {
+		return size;
+	}
+	
+	private int index(K key) {
+		return Math.abs(key.hashCode() % capacity);
+	}
+	
+	private Entry<K,V> find(int index, K key){
+		Entry<K,V> temp = table[index];
+		while(temp!=null) {
+			if(key.equals(temp.getKey())){
+				return temp;
+			}
+			temp = temp.next;
+		}
+		return null;
+	}
+	
+	private void rehash() {
+		size = 0;
+		
+		Entry<K,V>[] tempTable = table;
+		capacity = capacity*2;
+		Entry<K,V> temp;
+		
+		table = (Entry<K, V>[])	new Entry[capacity];
+		
+		for(int i = 0; i < tempTable.length; i++) {
+			if([tempTable[i] != null]) {
+				temp = tempTable[i];
+				while(temp != null) {
+					put(temp.getKey(), temp.getValue());
+					temp = temp.next;
+				}
+			}
+			
+		}
+	
+	}
+	
+	public String show() {
+		StringBuilder sb = new StringBuilder();
+		
+		Entry<K,V> e = null;
+		
+		for(int i=0; i < table.length; i++) {
+			sb.append(i);
+			sb.append("\t{");
+			
+			e = table[i];
+			while(e!=null) {
+				sb.append(e);
+				sb.append("=");
+				sb.append(e.getValue());
+				sb.append(" ");
+			}
+			sb.append("}\n");
+
+		}
+		return sb.toString();
+	}
+	
+	private static class Entry<K,V> implements Map.Entry<K,V>{
+		private K key;
+		private V value;
+		private Entry<K, V> next;
+		
+		public Entry(K key, V value) {
+			this.key = key;
+			this.value = value;
+
+		}
+		/*
+		public Entry<K, V> setNext(Entry<K, V> next){
+			this.next = next;
+			return this.next;
+		}*/
+
+		@Override
+		public K getKey() {
+			return key;
+		}
+
+		@Override
+		public V getValue() {
+			return value;
+		}
+
+		@Override
+		public V setValue(V value) {
+			this.value = value;
+			return value;
+		}
+		
+		public String toString() {
+			return key + "=" + value;
+		}
+		
+	}
+
+}

@@ -1,0 +1,215 @@
+package sudoku;
+
+public class SudokuSolver implements InterfaceSudokuSolver {
+
+	private int grid[][];
+
+	public SudokuSolver() {
+		grid = new int[9][9];
+
+		for (int i = 0; i < 9; i++) {
+			for (int j = 0; j < 9; j++) {
+				grid[i][j] = -1;
+			}
+		}
+	}
+
+	@Override
+	public boolean solve() {
+		return solve(0, 0);
+	}
+
+	private boolean solve(int row, int col) {
+		/*
+		 * if(row == 8) { return true; } int newRow; int newCol;
+		 * 
+		 * if(col < 8) { newCol = col+1; newRow = row; }else { newCol = 0; newRow = row
+		 * + 1; }
+		 * 
+		 * if(grid[row][col]==-1) { for(int i = 1; i < 10; i++) { if(isValid()) {
+		 * grid[row][col] = i; if(solve(newRow, newCol)) { return true; } remove(row,
+		 * col); } } return false; } return solve(newRow, newCol);
+		 * 
+		 */
+
+		/* for (int row = 0; row < 9; row++) {
+			for (int col = 0; col < 9; col++) {
+				// we search an empty cell
+				if (grid[row][col] == -1) {
+					// we try possible numbers
+					for (int number = 1; number <= 9; number++) {
+						if (isValidNumber(row, col, number)) {
+							// number ok. it respects sudoku constraints
+							grid[row][col] = number;
+
+							if (solve()) { // we start backtracking recursively
+								return true;
+							} else { // if not a solution, we empty the cell and we continue
+								grid[row][col] = -1;
+							}
+							
+						}
+					}
+
+					return false; // we return false
+				}
+			}
+			return true; // sudoku solved}
+		}
+
+		return true; // sudoku solved} */
+		if(col == 9) {
+			row++;
+			col = 0;
+		}
+		
+		if(grid[row][col] == -1) {
+			for (int i = 0; i < 9; i ++) {
+				if(isValidNumber(row, col, i)) {
+					grid[row][col] = i;
+					if(row == 8 && col == 8) {
+						return true;
+					}
+					if (solve(row, col + 1)) {
+						return true;
+					}else {
+						grid[row][col] = 0;
+					}
+				}
+			}
+			return false;
+		}else {
+			if(row == 8 && col == 8) {
+				return true;
+			}
+			if(solve(row, col +1)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public void add(int row, int col, int digit) {
+		if (digit < 1 || digit > 9) {
+			throw new IllegalArgumentException(digit + " is not a valid nbr");
+		}
+		if (isValidBox(row, col)) {
+			grid[row][col] = digit;
+		}
+	}
+
+	@Override
+	public void remove(int row, int col) {
+		if (isValidBox(row, col)) {
+			grid[row][col] = -1;
+		}
+	}
+
+	@Override
+	public int get(int row, int col) {
+		if (isValidBox(row, col)) {
+			return grid[row][col];
+		} else {
+			return -1;
+		}
+	}
+
+	@Override
+	public boolean isValid() {
+		for (int r = 0; r < 9; r++) {
+			for (int c = 0; c < 9; c++) {
+				if (!(isValidRow(grid[r][c], r) && isValidColumn(grid[r][c], c) && isValidRegion(grid[r][c], c, r))) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	public boolean isValidNumber(int row, int col, int number) {
+		if (!(isValidRow(number, row) || isValidColumn(number, col) || isValidRegion(number, row, col))) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public void clear() {
+		for (int i = 0; i < grid.length; i++) {
+			for (int j = 0; j < grid[i].length; j++) {
+				grid[i][j] = -1;
+			}
+		}
+
+	}
+
+	@Override
+	public void setMatrix(int[][] m) {
+		if (isValidMatrix(m)) {
+			grid = m.clone();
+		}
+	}
+
+	@Override
+	public int[][] getMatrix() {
+		return grid.clone();
+	}
+
+	private boolean isValidBox(int row, int col) {
+		if (row < 0 || row > 8 || col < 0 || col > 8) {
+			throw new IllegalArgumentException(row + "," + col + "is not a valid box");
+		}
+		return true;
+	}
+
+	private boolean isValidMatrix(int m[][]) {
+		if (m.length < 0 || m.length > 8 || m[0].length < 0 || m[0].length > 8 || m.length != m[0].length) {
+			throw new IllegalArgumentException("The matrix " + m + "is not valid");
+		}
+		return true;
+	}
+
+	private boolean isValidRow(int digit, int row) {
+		int rowArray[] = new int[9];
+		for (int col = 0; col < 9 ; col++) {
+			rowArray[col] = grid[row][col];
+		}
+		for (int i = 0; i < rowArray.length; i++) {
+			if (rowArray[i] == digit) {
+				return false;
+			}
+		}
+		return true;
+
+	}
+
+	private boolean isValidColumn(int digit, int col) {
+		int colArray[] = new int[9];
+		for (int row = 0; row < 9; row++) {
+			colArray[row] = grid[row][col];
+		}
+		for (int i = 0; i < 9; i++) {
+			if (digit == colArray[i]) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private boolean isValidRegion(int digit, int row, int col) {
+		int firstRow = (row / 3) * 3;
+		int firstCol = (col / 3) * 3;
+
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				if (grid[firstRow + i][firstCol + j] == digit) {
+					return false;
+				}
+			}
+		}
+		return true;
+
+	}
+
+}

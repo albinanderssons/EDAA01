@@ -1,0 +1,73 @@
+package sudoku;
+
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.GridLayout;
+
+import javax.swing.*;
+
+public class SudokuGUI {
+	private SudokuSolver sudoku;
+	private JPanel panel;
+	private JTextField[][] boxes;
+	
+	public SudokuGUI(SudokuSolver sudoku) {
+		this.sudoku = sudoku;
+		boxes = new JTextField[9][9];
+		SwingUtilities.invokeLater(() -> createWindow("Sudoko"));
+	
+	}
+
+	public void createWindow(String s) {
+		JFrame frame = new JFrame(s);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		Container pane = frame.getContentPane();
+		panel = new JPanel(new BorderLayout());
+		panel.setLayout(new GridLayout(9,9));
+		
+		for(int i = 0; i < 9; i++) {
+			for(int j = 0; j < 9; j++) {
+				JTextField field = new JTextField();
+				boxes[i][j] = field;
+				boxes[i][j].setText("0");
+				panel.add(field);
+			}
+		}
+		
+	
+		
+		JButton solveButton = new JButton("Solve");
+		JButton clearButton = new JButton("Clear");
+		
+		solveButton.addActionListener((e) -> {
+			if(sudoku.solve()){
+				rebuild();
+				JOptionPane.showMessageDialog(pane, "Solved!");
+			}else {
+				JOptionPane.showMessageDialog(pane, "Sudoku can not be solved");
+			}
+		});
+		
+		clearButton.addActionListener(e -> {
+			sudoku.clear();
+		});
+		
+		JPanel controls = new JPanel();
+		controls.add(solveButton);
+		controls.add(clearButton);
+		
+		pane.add(panel, BorderLayout.NORTH);
+		pane.add(controls, BorderLayout.SOUTH);
+		
+		frame.pack();
+		frame.setVisible(true);
+	}
+
+	private void rebuild() {
+		
+		
+	}
+	
+
+}

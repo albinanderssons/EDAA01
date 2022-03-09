@@ -1,0 +1,5 @@
+package w45;
+
+public class BinaryTree<E> {
+
+}
